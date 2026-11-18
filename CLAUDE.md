@@ -57,9 +57,9 @@ Tested in the sandbox (stubs for uv, sips, iconutil, open, curl, a fake `mlx_whi
 
 ## Constraints
 
-- The owner's employer has an IT policy; they did **not** want an AI agent driving their browser or publishing to GitHub on their behalf. Do git operations through the local `git` CLI only when the owner asks, and prefer showing the commands.
+- Use the local `git` CLI for commits and pushes (the owner is fine with Claude Code running them when asked). Do not drive the browser for GitHub; the owner publishes releases on github.com themselves.
 - The repo is public: never commit secrets, tokens, personal data or real audio.
-- The updater runs code from the repo on other people's Macs. Keep the confirmation step. If asked, add an option to disable update checks entirely.
+- The updater runs code from the repo on other people's Macs. Keep the confirmation step.
 - Keep `VERSION` equal to the release tag without the `v`. The app's window title shows the installed version.
 - Run `bash -n` on shell scripts and `python3 -m py_compile app/transskriber.py` before committing.
 
@@ -68,4 +68,5 @@ Tested in the sandbox (stubs for uv, sips, iconutil, open, curl, a fake `mlx_whi
 Done (2026-11-18): install on a real Mac, releases v1.0.0 to v1.0.3 published, self-update confirmed working.
 
 1. Try a real Danish recording and judge quality and paragraph breaks.
-2. Optional: setting or switch to turn off update checks (IT policy), a real progress indicator (chunk the audio), speaker separation (hard; extra model, Hugging Face account).
+
+Decided against for now: a switch to turn off update checks (not needed), a real progress indicator (not worth the effort). Speaker separation is postponed (hard; extra model, Hugging Face account).
