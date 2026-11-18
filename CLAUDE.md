@@ -21,6 +21,8 @@ requirements.txt      mlx-whisper, imageio-ffmpeg, huggingface_hub, python-docx,
 app/transskriber.py   the whole app
 assets/icon1024.png   app icon (waveform turning into text lines)
 scripts/afinstaller.sh, scripts/opdater.sh   copied to ~/Library/Application Support/Transskriber/ as *.command
+README.md             product-style user guide (Danish); keep maintainer details out of it
+VEDLIGEHOLDELSE.md    maintainer notes (Danish): releasing, how updates work, security, pitfalls
 ```
 
 ## Key design decisions (keep unless there is a reason)
