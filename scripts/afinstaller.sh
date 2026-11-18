@@ -1,6 +1,9 @@
 #!/bin/bash
 # Fjerner Transskriber helt fra denne Mac.
 # Dine lydfiler og Word-dokumenter bliver ikke rørt.
+#
+#   bash Afinstaller.command          spørger først i Terminal
+#   bash Afinstaller.command --ja     spørger ikke (bruges af appens menu, som selv har spurgt)
 
 main() {
   BASE="$HOME/Library/Application Support/Transskriber"
@@ -19,11 +22,13 @@ main() {
   echo ""
   echo "Dine lydfiler og Word-dokumenter bliver IKKE rørt."
   echo ""
-  read -r -p "Vil du fortsætte? Skriv 'ja' og tryk Enter: " svar
-  case "$svar" in
-    ja|Ja|JA) ;;
-    *) echo "Afbrudt. Intet er slettet."; return 0 ;;
-  esac
+  if [ "$1" != "--ja" ]; then
+    read -r -p "Vil du fortsætte? Skriv 'ja' og tryk Enter: " svar
+    case "$svar" in
+      ja|Ja|JA) ;;
+      *) echo "Afbrudt. Intet er slettet."; return 0 ;;
+    esac
+  fi
 
   rm -rf "$APP"
   rm -rf "$BASE"

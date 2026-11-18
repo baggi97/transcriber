@@ -54,13 +54,13 @@ Lyden og teksten bliver på din Mac. Programmet bruger kun internettet til at sp
 
 ## Afinstallere
 
-Kør denne kommando i Terminal:
+Vælg **Transskriber → Afinstaller Transskriber…** i menulinjen øverst, og bekræft. Programmet lukker og fjerner programmet, motoren og sprogmodellen. Dine lydfiler og Word-dokumenter bliver ikke rørt. Træk bagefter ikonet ud af Dock'en, hvis det ligger der.
+
+Det samme kan gøres fra Terminal:
 
 ```bash
 bash "$HOME/Library/Application Support/Transskriber/Afinstaller.command"
 ```
-
-Den fjerner programmet, motoren og sprogmodellen. Dine lydfiler og Word-dokumenter bliver ikke rørt.
 
 ## Fejlfinding
 

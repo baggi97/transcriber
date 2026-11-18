@@ -22,6 +22,7 @@ os.environ["HF_HUB_OFFLINE"] = "1"  # modellen ligger allerede lokalt
 SETTINGS_FILE = os.path.join(BASE, "settings.json")
 CONFIG_FILE = os.path.join(BASE, "config.env")
 VERSION_FILE = os.path.join(BASE, "version.txt")
+UNINSTALL_SCRIPT = os.path.join(BASE, "Afinstaller.command")
 APP_PATH = os.path.expanduser("~/Applications/Transskriber.app")
 UPDATE_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000  # tjek for opdateringer hver 6. time
 
@@ -247,6 +248,7 @@ class App:
         root.configure(bg=BG)
         root.geometry(f"{self.W}x{self.H}")
         root.resizable(False, False)
+        self.build_menu()
 
         self.icon = None
         self.small_icon = None
@@ -321,6 +323,64 @@ class App:
             root.createcommand("::tk::mac::OpenDocument", self.on_open_docs)
         except Exception:
             pass
+
+    # ---------- menulinje ----------
+    def build_menu(self):
+        """Punkter i app-menuen 'Transskriber' i menulinjen (Tk's menu med navnet 'apple')."""
+        menubar = tk.Menu(self.root)
+        app_menu = tk.Menu(menubar, name="apple", tearoff=0)
+        app_menu.add_command(label="Om Transskriber", command=self.show_about)
+        app_menu.add_separator()
+        app_menu.add_command(label="Afinstaller Transskriber…", command=self.ask_uninstall)
+        app_menu.add_separator()
+        menubar.add_cascade(menu=app_menu)
+        self.root.config(menu=menubar)
+
+    def show_about(self):
+        version = f" {self.version}" if self.version else ""
+        messagebox.showinfo(
+            "Om Transskriber",
+            f"Transskriber{version}\n\nLyd til dansk tekst. Alt sker lokalt på din Mac.\n\n"
+            "Lavet af Rasmus Lolk Andersen.",
+        )
+
+    def ask_uninstall(self):
+        if self.busy:
+            messagebox.showinfo("Afinstaller Transskriber", "Vent, til programmet er færdigt med at arbejde.")
+            return
+        if not os.path.isfile(UNINSTALL_SCRIPT):
+            messagebox.showerror("Afinstaller Transskriber", "Afinstallations-scriptet kunne ikke findes.")
+            return
+        ok = messagebox.askyesno(
+            "Afinstaller Transskriber",
+            "Dette fjerner Transskriber fra denne Mac: programmet, motoren og sprogmodellen (ca. 1,5 GB).\n\n"
+            "Dine lydfiler og Word-dokumenter bliver ikke rørt.\n\n"
+            "Programmet lukker, og der kommer en besked, når det er fjernet. Vil du fortsætte?",
+            icon="warning", default="no",
+        )
+        if ok:
+            self.uninstall()
+
+    def uninstall(self):
+        """Lukker appen og lader et separat bash-script fjerne alt, når appen er lukket."""
+        script = (
+            'while kill -0 "$1" 2>/dev/null; do sleep 0.3; done\n'
+            '/bin/bash "$2" --ja\n'
+            "afplay /System/Library/Sounds/Glass.aiff &\n"
+            "osascript -e 'display notification \"Transskriber er fjernet. "
+            "Træk ikonet ud af Dock’en, hvis det ligger der.\" with title \"Transskriber\"'\n"
+        )
+        try:
+            subprocess.Popen(
+                ["/bin/bash", "-c", script, "_", str(os.getpid()), UNINSTALL_SCRIPT],
+                start_new_session=True, stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            )
+        except Exception as e:
+            messagebox.showerror("Afinstaller Transskriber", f"Afinstallationen kunne ikke starte:\n\n{e}")
+            return
+        self.release_awake()
+        self.root.destroy()
 
     # ---------- afkrydsning ----------
     def update_check(self):
