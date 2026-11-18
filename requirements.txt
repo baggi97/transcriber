@@ -1,0 +1,5 @@
+mlx-whisper
+imageio-ffmpeg
+huggingface_hub
+python-docx
+tkinterdnd2
