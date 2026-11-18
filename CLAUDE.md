@@ -46,11 +46,12 @@ Tested in the sandbox (stubs for uv, sips, iconutil, open, curl, a fake `mlx_whi
 3. Window look, Dock icon and menu bar name show "Transskriber"
 4. `tkinterdnd2` loads; transcription via the window works
 5. Finish sound and `osascript` notification both work
+6. Self-update against real GitHub Releases: 1.0.2 -> 1.0.3 (banner, release notes dialog, install, relaunch)
 
 **Still not tested:**
 - Quality and paragraph breaks on a real (non-synthetic) Danish recording
 - Dropping files on the Dock/Finder icon
-- The updater against real GitHub Releases (first attempt, 1.0.0 -> 1.0.1, failed with "Denne app kræver en Mac med Apple-chip" because of the Rosetta issue above; fixed in 1.0.2)
+- Updating from 1.0.0/1.0.1 (launched under Rosetta) to 1.0.2+: the re-exec fix was only tested in isolation. The first real attempt, 1.0.0 -> 1.0.1, failed with "Denne app kræver en Mac med Apple-chip" before the fix.
 
 **Known pitfall:** a previous install run with `sudo` leaves root-owned `~/Library/Application Support/Transskriber`, `~/Applications/Transskriber.app` and `~/.cache/huggingface`, which used to make `install.sh` fail with "Permission denied". `install.sh` now refuses to run as root, detects root-owned folders before doing anything, and prints the exact `sudo chown -R` command to fix them (in Danish).
 
@@ -62,9 +63,9 @@ Tested in the sandbox (stubs for uv, sips, iconutil, open, curl, a fake `mlx_whi
 - Keep `VERSION` equal to the release tag without the `v`. The app's window title shows the installed version.
 - Run `bash -n` on shell scripts and `python3 -m py_compile app/transskriber.py` before committing.
 
-## Suggested first steps
+## Next steps
 
-1. Run `bash install.sh` on this Mac, fix whatever breaks, and try a short Danish audio clip.
-2. Push to GitHub and create release `v1.0.0`.
-3. Bump to 1.0.1, publish a second release, and confirm the update banner and relaunch work for real.
-4. Optional: setting or switch to turn off update checks (IT policy), a real progress indicator (chunk the audio), speaker separation (hard; extra model, Hugging Face account).
+Done (2026-11-18): install on a real Mac, releases v1.0.0 to v1.0.3 published, self-update confirmed working.
+
+1. Try a real Danish recording and judge quality and paragraph breaks.
+2. Optional: setting or switch to turn off update checks (IT policy), a real progress indicator (chunk the audio), speaker separation (hard; extra model, Hugging Face account).
