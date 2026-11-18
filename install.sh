@@ -8,6 +8,13 @@
 
 set -e
 
+# Startet under Rosetta? Det sker, når version 1.0.0 eller 1.0.1 af appen opdaterer sig selv, fordi
+# deres opstarts-script kørte under Rosetta. Start så forfra som Apple-chip-program,
+# ellers kan værktøjer som uv blive hentet i Intel-udgaven.
+if [ "$(sysctl -n sysctl.proc_translated 2>/dev/null)" = "1" ]; then
+  exec /usr/bin/arch -arm64 /bin/bash "${BASH_SOURCE[0]}" "$@"
+fi
+
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 for f in VERSION config.env requirements.txt app/transskriber.py assets/icon1024.png \
@@ -28,7 +35,8 @@ BASE="$HOME/Library/Application Support/Transskriber"
 APP_DIR="$HOME/Applications"
 APP="$APP_DIR/Transskriber.app"
 
-if [ "$(uname -m)" != "arm64" ]; then
+# hw.optional.arm64 er 1 på en Apple-chip, også når noget kører under Rosetta (det gør uname -m ikke)
+if [ "$(sysctl -n hw.optional.arm64 2>/dev/null)" != "1" ]; then
   echo "Denne app kræver en Mac med Apple-chip (M1 eller nyere)."
   exit 1
 fi
@@ -140,6 +148,9 @@ cat > "$APP/Contents/Info.plist" <<PLISTEOF
   <key>CFBundleShortVersionString</key><string>$VERSION</string>
   <key>CFBundleVersion</key><string>$VERSION</string>
   <key>LSMinimumSystemVersion</key><string>13.0</string>
+  <!-- Opstarts-scriptet har ingen arkitektur, så uden disse starter macOS appen under Rosetta -->
+  <key>LSRequiresNativeExecution</key><true/>
+  <key>LSArchitecturePriority</key><array><string>arm64</string></array>
   <key>NSHighResolutionCapable</key><true/>
 </dict>
 </plist>

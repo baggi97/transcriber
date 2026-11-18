@@ -28,7 +28,7 @@ scripts/afinstaller.sh, scripts/opdater.sh   copied to ~/Library/Application Sup
 - **Install location:** engine, venv, model settings in `~/Library/Application Support/Transskriber`; app bundle in `~/Applications/Transskriber.app`. The .app is created locally by `install.sh`, so there is no Gatekeeper warning and no signing.
 - **Python:** `uv` installs Python 3.12 (python-build-standalone, includes Tk). No Homebrew needed. ffmpeg comes from `imageio-ffmpeg` and is symlinked into `~/Library/Application Support/Transskriber/bin`.
 - **Offline:** model is downloaded during install; the app sets `HF_HUB_OFFLINE=1`. Subprocesses that must download (the updater) unset it.
-- **Launcher:** `Contents/MacOS/Transskriber` is a tiny bash script that `exec`s the venv Python on `transskriber.py`.
+- **Launcher:** `Contents/MacOS/Transskriber` is a tiny bash script that `exec`s the venv Python on `transskriber.py`. Because a script has no CPU architecture, macOS launches it under Rosetta unless `Info.plist` has `LSRequiresNativeExecution` + `LSArchitecturePriority` (arm64). Python itself is arm64-only so it runs natively anyway, but child processes (e.g. the updater's `install.sh`) inherit Rosetta. Versions 1.0.0 and 1.0.1 lack these keys, so `install.sh` re-execs itself with `arch -arm64` when `sysctl.proc_translated` is 1, and checks for Apple Silicon with `sysctl hw.optional.arm64` (not `uname -m`).
 - **Paragraphs:** segments are merged into paragraphs by pauses (>= 1.5 s) and length; shorter paragraphs when timestamps are on. Optional `[HH:MM:SS]` bold prefix per paragraph; the setting persists in `settings.json`.
 - **Drag and drop:** via `tkinterdnd2`, with automatic fallback to the button if it cannot load. Files can also be dropped on the app icon (`CFBundleDocumentTypes` + `::tk::mac::OpenDocument`).
 - **While working:** `caffeinate -i -w <pid>` prevents idle sleep; on finish: `afplay` sound plus an `osascript` notification (arguments passed via argv, never interpolated).
@@ -50,7 +50,7 @@ Tested in the sandbox (stubs for uv, sips, iconutil, open, curl, a fake `mlx_whi
 **Still not tested:**
 - Quality and paragraph breaks on a real (non-synthetic) Danish recording
 - Dropping files on the Dock/Finder icon
-- The updater against real GitHub Releases
+- The updater against real GitHub Releases (first attempt, 1.0.0 -> 1.0.1, failed with "Denne app kræver en Mac med Apple-chip" because of the Rosetta issue above; fixed in 1.0.2)
 
 **Known pitfall:** a previous install run with `sudo` leaves root-owned `~/Library/Application Support/Transskriber`, `~/Applications/Transskriber.app` and `~/.cache/huggingface`, which used to make `install.sh` fail with "Permission denied". `install.sh` now refuses to run as root, detects root-owned folders before doing anything, and prints the exact `sudo chown -R` command to fix them (in Danish).
 
