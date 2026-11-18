@@ -74,6 +74,28 @@ bash "$HOME/Library/Application Support/Transskriber/Afinstaller.command"
 
 Transskriber bruger OpenAIs talemodel Whisper (`whisper-large-v3-turbo`) via [mlx-whisper](https://github.com/ml-explore/mlx-examples/tree/main/whisper), som udnytter Apple-chippen. Brugerfladen er lavet med Tkinter, og dokumenterne skrives med python-docx. Installationen henter selv Python 3.12 med [uv](https://github.com/astral-sh/uv) og ffmpeg via imageio-ffmpeg, så der skal hverken bruges Homebrew eller administratoradgang.
 
+## Licens
+
+Transskriber er udgivet under [MIT-licensen](LICENSE).
+
+Repoet indeholder kun Transskribers egen kode. Resten hentes fra de officielle kilder (PyPI og Hugging Face) under installationen og er omfattet af sine egne licenser:
+
+| Komponent | Bruges til | Licens |
+|-----------|------------|--------|
+| [Whisper large-v3-turbo](https://huggingface.co/openai/whisper-large-v3-turbo) fra OpenAI, i [MLX-udgave](https://huggingface.co/mlx-community/whisper-large-v3-turbo) | Sprogmodellen | MIT |
+| [mlx-whisper](https://github.com/ml-explore/mlx-examples) og [MLX](https://github.com/ml-explore/mlx) fra Apple | Kører modellen på Apple-chippen | MIT |
+| [python-docx](https://github.com/python-openxml/python-docx) | Skriver Word-dokumenterne | MIT |
+| [tkinterdnd2](https://github.com/Eliav2/tkinterdnd2) med tkdnd | Træk og slip | MIT (tkdnd: BSD) |
+| [huggingface_hub](https://github.com/huggingface/huggingface_hub) | Henter modellen under installationen | Apache 2.0 |
+| [imageio-ffmpeg](https://github.com/imageio/imageio-ffmpeg) | Leverer ffmpeg | BSD-2-Clause |
+| [FFmpeg](https://ffmpeg.org) | Læser lyd- og videofilerne | GPL v2 eller nyere |
+| [Python](https://www.python.org) 3.12 med Tcl/Tk | Kører appen og tegner vinduet | PSF-licensen, Tcl/Tk-licensen (BSD-agtig) |
+| [uv](https://github.com/astral-sh/uv) | Installerer Python (kun under installationen) | MIT eller Apache 2.0 |
+
+Øvrige pakker, som motoren trækker med (fx NumPy, SciPy, PyTorch, Numba og tiktoken), er under MIT, BSD, Apache 2.0, MPL 2.0 eller PSF.
+
+FFmpeg kører som et selvstændigt program, som Transskriber kalder. Det er ikke bygget ind i appen, og derfor gælder GPL-licensen kun for FFmpeg selv.
+
 ---
 
 Lavet af Rasmus Lolk Andersen.

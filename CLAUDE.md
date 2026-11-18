@@ -23,6 +23,7 @@ assets/icon1024.png   app icon (waveform turning into text lines)
 scripts/afinstaller.sh, scripts/opdater.sh   copied to ~/Library/Application Support/Transskriber/ as *.command
 README.md             product-style user guide (Danish); keep maintainer details out of it
 VEDLIGEHOLDELSE.md    maintainer notes (Danish): releasing, how updates work, security, pitfalls
+LICENSE               MIT. README's "Licens" section lists the components' licenses; update it when requirements.txt or the model changes
 ```
 
 ## Key design decisions (keep unless there is a reason)
