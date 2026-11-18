@@ -14,6 +14,7 @@ A small macOS app (Apple Silicon only) that turns audio files into Danish Word d
 ## Repo layout
 
 ```
+hent.sh               one-line installer from the README: resolves the latest release via the github.com redirect (no API quota), downloads its tarball and runs its install.sh. Served from main, so changes go live immediately
 install.sh            installs OR updates (idempotent); builds the .app locally
 config.env            GITHUB_REPO and MODEL, read by bash AND by the app (KEY="value" lines only)
 VERSION               version number, must match the release tag (v + VERSION)

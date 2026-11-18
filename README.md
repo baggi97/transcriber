@@ -26,14 +26,25 @@ Understøttede formater: MP3, M4A, WAV, AAC, FLAC, OGG, Opus samt lyden fra vide
 
 ## Installation
 
-1. Hent den nyeste version under [**Releases**](https://github.com/baggi97/transcriber/releases/latest): klik på **Source code (zip)**. Er filen ikke pakket ud af sig selv, så dobbeltklik på den i *Overførsler*.
-2. Åbn programmet **Terminal** (find det med Spotlight: tryk ⌘ + mellemrum og skriv *Terminal*).
-3. Skriv `bash ` (med et mellemrum efter), træk filen `install.sh` fra den udpakkede mappe ind i Terminal-vinduet, og tryk Enter.
-4. Vent til der står **Færdig!**. Første gang tager det et par minutter, fordi sprogmodellen (ca. 1,5 GB) skal hentes.
+1. Åbn programmet **Terminal** (find det med Spotlight: tryk ⌘ + mellemrum og skriv *Terminal*).
+2. Kopiér denne linje, sæt den ind i Terminal-vinduet, og tryk Enter:
+
+   ```bash
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/baggi97/transcriber/main/hent.sh)"
+   ```
+
+3. Vent til der står **Færdig!**. Første gang tager det et par minutter, fordi sprogmodellen (ca. 1,5 GB) skal hentes.
 
 Programmet ligger nu i mappen *Programmer* i din hjemmemappe (`~/Applications/Transskriber.app`). Træk det ned i Dock'en, så er det nemt at finde.
 
-> Kør installationen uden `sudo`. Den skal ikke have administratoradgang.
+Linjen henter den nyeste udgivne version her fra GitHub og installerer den. Der skal ikke bruges administratoradgang, så skriv ikke `sudo` foran.
+
+<details>
+<summary>Vil du hellere se filerne, før du installerer?</summary>
+
+Hent den nyeste version under [**Releases**](https://github.com/baggi97/transcriber/releases/latest) (**Source code (zip)**), og pak den ud. Skriv `bash ` (med et mellemrum efter) i Terminal, træk filen `install.sh` fra den udpakkede mappe ind i vinduet, og tryk Enter.
+
+</details>
 
 ## Sådan bruger du det
 

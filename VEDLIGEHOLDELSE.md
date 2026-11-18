@@ -5,6 +5,7 @@ Noter til den, der vedligeholder Transskriber og udgiver nye versioner. Brugerve
 ## Indhold
 
 ```
+hent.sh               Henter nyeste release og kører dens install.sh (bruges af installationslinjen i README)
 install.sh            Installerer og opdaterer programmet (kan køres igen og igen)
 config.env            Repo-navn og sprogmodel. Læses både af bash og af appen
 VERSION               Versionsnummer, fx 1.0.3. Skal passe med release-tagget
@@ -36,6 +37,8 @@ Repoet skal være **offentligt**, så appen kan tjekke for opdateringer uden log
    - Tryk **Publish release**.
 
 Brugerne ser først opdateringen, når releasen er udgivet. Du kan altså pushe til `main` uden, at nogen påvirkes. Kladder og pre-releases ignoreres, så de er gode til at teste.
+
+**Undtagelse: `hent.sh`.** Installationslinjen i README henter `hent.sh` direkte fra `main`, så ændringer i den virker med det samme for nye installationer. Den henter selv altid den nyeste udgivne release, så resten af koden følger stadig releases. Test ændringer i `hent.sh` lokalt (`bash hent.sh`), før du pusher. Repo-navnet står også i `hent.sh`, så ret det dér, hvis repoet flytter.
 
 ## Sådan virker opdateringen
 
