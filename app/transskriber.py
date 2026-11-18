@@ -147,6 +147,87 @@ def notify(message):
         pass
 
 
+# ---------- macOS-menuen ----------
+# Tk laver selv resten af app-menuen (Skjul, Afslut osv.) på engelsk og med navnet "python".
+# Det rettes via macOS' Objective-C-API med ctypes, så der ikke skal installeres PyObjC.
+# Går noget galt, starter appen bare med Tk's standardmenu.
+
+class ObjC:
+    def __init__(self):
+        import ctypes
+        import ctypes.util
+
+        self.c = ctypes
+        self.lib = ctypes.cdll.LoadLibrary(ctypes.util.find_library("objc"))
+        ctypes.cdll.LoadLibrary(ctypes.util.find_library("Foundation"))
+        self.lib.objc_getClass.restype = ctypes.c_void_p
+        self.lib.objc_getClass.argtypes = [ctypes.c_char_p]
+        self.lib.sel_registerName.restype = ctypes.c_void_p
+        self.lib.sel_registerName.argtypes = [ctypes.c_char_p]
+
+    def send(self, obj, selector, *args, argtypes=(), restype=None):
+        f = self.lib.objc_msgSend
+        f.restype = restype or self.c.c_void_p
+        f.argtypes = [self.c.c_void_p, self.c.c_void_p, *argtypes]
+        return f(obj, self.lib.sel_registerName(selector.encode()), *args)
+
+    def cls(self, name):
+        return self.lib.objc_getClass(name.encode())
+
+    def string(self, text):
+        return self.send(self.cls("NSString"), "stringWithUTF8String:", text.encode("utf-8"),
+                         argtypes=[self.c.c_char_p])
+
+    def text(self, obj):
+        raw = self.send(obj, "UTF8String", restype=self.c.c_char_p) if obj else None
+        return raw.decode("utf-8") if raw else ""
+
+
+def set_mac_app_name(name):
+    """Tk navngiver menupunkterne efter CFBundleName, men programmet er venv'ens python,
+    som ikke har noget, så der står "python". Skal kaldes, før Tk startes."""
+    try:
+        o = ObjC()
+        info = o.send(o.send(o.cls("NSBundle"), "mainBundle"), "infoDictionary")
+        if info:
+            o.send(info, "setObject:forKey:", o.string(name), o.string("CFBundleName"),
+                   argtypes=[o.c.c_void_p, o.c.c_void_p])
+    except Exception:
+        pass
+
+
+def danish_app_menu(name):
+    """Oversætter Tk's punkter i app-menuen til dansk og skjuler "Settings…" (gør ikke noget)
+    og "Services" (bruges ikke). Skal kaldes, efter at Tk har bygget menuen."""
+    try:
+        o = ObjC()
+        c = o.c
+        main_menu = o.send(o.send(o.cls("NSApplication"), "sharedApplication"), "mainMenu")
+        first = o.send(main_menu, "itemAtIndex:", 0, argtypes=[c.c_long]) if main_menu else None
+        menu = o.send(first, "submenu") if first else None
+        if not menu:
+            return
+        count = o.send(menu, "numberOfItems", restype=c.c_long)
+        items = [o.send(menu, "itemAtIndex:", i, argtypes=[c.c_long]) for i in range(count)]
+        fixed = {"Hide Others": "Skjul andre", "Show All": "Vis alle"}
+        for i, item in enumerate(items):
+            title = o.text(o.send(item, "title"))
+            new = fixed.get(title)
+            if title.startswith("Hide ") and not new:
+                new = f"Skjul {name}"
+            elif title.startswith("Quit "):
+                new = f"Afslut {name}"
+            elif title.rstrip(".…") in ("Settings", "Preferences", "Services"):
+                # Skjules i stedet for at fjernes, fordi Tk stadig kan henvise til punkterne
+                o.send(item, "setHidden:", True, argtypes=[c.c_bool])
+                if i + 1 < count and o.send(items[i + 1], "isSeparatorItem", restype=c.c_bool):
+                    o.send(items[i + 1], "setHidden:", True, argtypes=[c.c_bool])
+            if new:
+                o.send(item, "setTitle:", o.string(new), argtypes=[c.c_void_p])
+    except Exception:
+        pass
+
+
 # ---------- opdateringer via GitHub Releases ----------
 
 REPO_RE = re.compile(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+")
@@ -332,8 +413,7 @@ class App:
         app_menu.add_command(label="Om Transskriber", command=self.show_about)
         app_menu.add_separator()
         app_menu.add_command(label="Afinstaller Transskriber…", command=self.ask_uninstall)
-        app_menu.add_separator()
-        menubar.add_cascade(menu=app_menu)
+        menubar.add_cascade(menu=app_menu)  # Tk tilføjer selv en streg og resten af app-menuen
         self.root.config(menu=menubar)
 
     def show_about(self):
@@ -659,6 +739,7 @@ class App:
 
 
 if __name__ == "__main__":
+    set_mac_app_name("Transskriber")
     use_dnd = False
     root = None
     if HAS_DND_LIB:
@@ -670,4 +751,6 @@ if __name__ == "__main__":
     if root is None:
         root = tk.Tk()
     App(root, dnd=use_dnd)
+    root.update_idletasks()
+    danish_app_menu("Transskriber")
     root.mainloop()
